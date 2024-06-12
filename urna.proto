@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+// Serviços 
+service UrnaServico {
+    rpc ListarCandidatos( Empty ) returns ( ListaCandidatos );
+    rpc Votar( Numero ) returns ( Candidato );
+    rpc ListarVotos ( Empty ) returns (ListaVotos);
+    rpc Apuracao( Empty ) returns ( ListaApuracao );  
+}
+
+// Entidades
+message Empty {}
+
+message Candidato {
+    int32 id = 1;
+    int32 numero = 2;
+    string nome = 3;
+}
+
+message ListaCandidatos {
+    repeated Candidato listaCandidatos = 1;
+}
+
+message Numero {
+    int32 numero = 1;
+}
+
+message Voto {
+    string nomeCandidato = 1;
+    int32 numeroCandidato = 2;
+    string ipEleitor = 3;
+}
+
+message ListaVotos {
+    repeated Voto listaVotos = 1;
+}
+
+message Apuracao {
+    int32 numero = 1;
+    int32 porcentagemVoto = 2;
+}
+
+message ListaApuracao {
+    repeated Apuracao listaApuracao = 1;
+}
