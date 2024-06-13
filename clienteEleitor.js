@@ -25,7 +25,6 @@ const rl = readline.createInterface({
     output: process.stdout,
 });
 
-
 rl.question("Digite o número do seu candidato(a):", (input) => {
     const numeroCandidato = input
     votar(numeroCandidato)

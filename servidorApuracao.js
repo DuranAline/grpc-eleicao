@@ -1,4 +1,4 @@
-import { credentials, loadPackageDefinition } from "@grpc/grpc-js";
+import { credentials, loadPackageDefinition, Server, ServerCredentials } from "@grpc/grpc-js";
 import { loadSync } from "@grpc/proto-loader";
 import readline from 'readline';
 
@@ -8,47 +8,32 @@ const urnaProto = loadPackageDefinition(urnaDefinicoes);
 
 const apuracaoCliente = new urnaProto.UrnaServico('127.0.0.1:5050', credentials.createInsecure());
 
-let votos = 0;
-const apuracaoFinal = []
+let dadosEleicao = [];
+let listaApuracao = [];
 
 function apurarVotos() {
-    console.log(1);
-    let total = votos.length;
-    let votoCandidatoI = 0;
-    let votoCandidatoII = 0;
-    
-    votos.map((voto) => {
-        if(voto.numeroCandidato == 51) {
-            votoCandidatoI = votoCandidatoI + 1;
-        } else {
-            votoCandidatoII = votoCandidatoII + 1;
-        }
+    listaApuracao = [];
+    let candidatoI = dadosEleicao.find((candidato) => candidato.numero == 51);
+    let candidatoII = dadosEleicao.find((candidato) => candidato.numero == 17);
+    let qtdeVotoTotal = candidatoI.qtdeVoto + candidatoII.qtdeVoto;
+
+    dadosEleicao.map((candidato) => {
+        listaApuracao.push(
+            {
+                candidato: candidato,
+                porcentagemVoto: ((candidato.qtdeVoto / qtdeVotoTotal) * 100)
+            }
+        )
     })
-
-    let apuracaoCandidatoI = ((votoCandidatoI / total) * 100)
-    let apuracaoCandidatoII = ((votoCandidatoII / total) * 100)
-    console.log(votoCandidatoI, total);
-    const candidatoI = {
-        numero: 51,
-        porcentagemVoto: apuracaoCandidatoI,
-    }
-
-    apuracaoFinal.push(candidatoI)
-
-    const candidatoII = {
-        numero: 17,
-        porcentagemVoto: apuracaoCandidatoII,
-    }
-
-    apuracaoFinal.push(candidatoII)
 }
 
-apuracaoCliente.listarVotos({}, (erro, listarVotos)=> {
+apuracaoCliente.computarVotos({}, (erro, listaCandidatos)=> {
     if  (erro){
         console.log(erro);
         return;
     }
-    votos = listarVotos.listaVotos;
+
+    dadosEleicao = listaCandidatos.listaCandidatos;
 })
 
 const servidorApuracao = new Server();
@@ -60,6 +45,6 @@ servidorApuracao.bindAsync(enderecoServidor, ServerCredentials.createInsecure(),
 servidorApuracao.addService(urnaProto.UrnaServico.service, {
     apuracao: (call, callBack) => {
         apurarVotos()
-        callBack(null, {listaApuracao: apuracaoFinal})
+        callBack(null, {listaApuracao: listaApuracao})
     }
 })

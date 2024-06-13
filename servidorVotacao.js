@@ -10,12 +10,14 @@ const candidatos = [
     {
         id: 1,
         numero: 51,
-        nome: "Maria Pinguiha"
+        nome: "Maria Pinguinha",
+        qtdeVoto: 0,
     },
     {
         id: 2,
         numero: 17,
-        nome: "Tadeu Patriota"
+        nome: "Tadeu Patriota",
+        qtdeVoto: 0,
     }
 ]
 
@@ -37,22 +39,28 @@ servidorVotacao.addService(urnaProto.UrnaServico.service, {
             const votoEleitor = call.request
             const index = candidatos.findIndex(candidato => candidato.numero == votoEleitor.numero)
             const candidatoVotado = candidatos[index]
-            //console.log(votoEleitor, candidatoVotado);
+
             const voto = {
                 nomeCandidato: candidatoVotado.nome,
                 numeroCandidato: candidatoVotado.numero,
                 ipEleitor: call.getPeer()
             }
-            //console.log(voto);
+
+            candidatos.map((candidato) => {
+                if(candidato.numero == votoEleitor.numero) {
+                    candidato.qtdeVoto = candidato.qtdeVoto + 1;
+                }
+            })
+
             votos.push(voto)
+            //console.log(candidatos);
             callBack(null, candidatoVotado)
         } 
     },
-    listarVotos: (call, callBack) =>{
-        //console.log(votos);
-        callBack(null, {listaVotos: votos})
-    }
 
+    computarVotos: (call, callBack) =>{
+        callBack(null, { listaCandidatos: candidatos })
+    }
 });
 
 const enderecoServidor = "0.0.0.0:5050";

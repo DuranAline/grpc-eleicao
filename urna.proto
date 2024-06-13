@@ -4,7 +4,7 @@ syntax = "proto3";
 service UrnaServico {
     rpc ListarCandidatos( Empty ) returns ( ListaCandidatos );
     rpc Votar( Numero ) returns ( Candidato );
-    rpc ListarVotos ( Empty ) returns (ListaVotos);
+    rpc ComputarVotos( Empty ) returns ( ListaCandidatos );
     rpc Apuracao( Empty ) returns ( ListaApuracao );  
 }
 
@@ -15,6 +15,7 @@ message Candidato {
     int32 id = 1;
     int32 numero = 2;
     string nome = 3;
+    int32 qtdeVoto = 4;
 }
 
 message ListaCandidatos {
@@ -29,6 +30,7 @@ message Voto {
     string nomeCandidato = 1;
     int32 numeroCandidato = 2;
     string ipEleitor = 3;
+    int32 qtdeVoto = 4;
 }
 
 message ListaVotos {
@@ -36,8 +38,8 @@ message ListaVotos {
 }
 
 message Apuracao {
-    int32 numero = 1;
-    int32 porcentagemVoto = 2;
+    Candidato candidato = 1;
+    float porcentagemVoto = 2;
 }
 
 message ListaApuracao {
