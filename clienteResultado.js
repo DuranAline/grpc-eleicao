@@ -12,8 +12,7 @@ clienteResultado.apuracao({}, (erro, listaApuracao) => {
         console.log(erro);
         return;
     }
-    //console.log(listaApuracao.listaApuracao);
     listaApuracao.listaApuracao.map((apuracao) => {
-        console.log("Candidato: " + apuracao.candidato.nome + ", porcentagem de votos: " + apuracao.porcentagemVoto.toFixed(2) + "%");
+        console.log("Candidato: " + apuracao.candidato.nome + ", total de votos: " + apuracao.candidato.qtdeVoto +" - " + apuracao.porcentagemVoto.toFixed(2) + "%");
     })
 })

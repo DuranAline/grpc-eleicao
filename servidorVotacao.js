@@ -23,7 +23,7 @@ const candidatos = [
 
 const votos = []
 
-function verificaEleitor(ipEleitor) {
+function verificaVotoEleitor(ipEleitor) {
     return votos.find(voto => voto.ipEleitor == ipEleitor)
 }
 
@@ -35,7 +35,10 @@ servidorVotacao.addService(urnaProto.UrnaServico.service, {
     },
 
     votar: (call, callBack) => {
-        if(!verificaEleitor(call.getPeer())) {
+        let votoEleitor = verificaVotoEleitor(call.getPeer());
+        let menssagem = { menssagemRetorno: '' };
+
+        if(!votoEleitor) {
             const votoEleitor = call.request
             const index = candidatos.findIndex(candidato => candidato.numero == votoEleitor.numero)
             const candidatoVotado = candidatos[index]
@@ -53,9 +56,12 @@ servidorVotacao.addService(urnaProto.UrnaServico.service, {
             })
 
             votos.push(voto)
-            //console.log(candidatos);
-            callBack(null, candidatoVotado)
-        } 
+            menssagem.menssagemRetorno = "Votacão realizada com sucesso.\nVocê votou em " + candidatoVotado.nome
+        } else {
+             menssagem.menssagemRetorno = "Só é permitido votar uma vez!\nVocê já votou em " + 
+                                          votoEleitor.nome + "\nAguardar a apuração dos votos."
+        }
+        callBack(null, menssagem)
     },
 
     computarVotos: (call, callBack) =>{

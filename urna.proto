@@ -3,7 +3,7 @@ syntax = "proto3";
 // Serviços 
 service UrnaServico {
     rpc ListarCandidatos( Empty ) returns ( ListaCandidatos );
-    rpc Votar( Numero ) returns ( Candidato );
+    rpc Votar( Numero ) returns ( MenssagemRetorno );
     rpc ComputarVotos( Empty ) returns ( ListaCandidatos );
     rpc Apuracao( Empty ) returns ( ListaApuracao );  
 }
@@ -24,6 +24,10 @@ message ListaCandidatos {
 
 message Numero {
     int32 numero = 1;
+}
+
+message MenssagemRetorno {
+    string menssagemRetorno = 1;
 }
 
 message Voto {

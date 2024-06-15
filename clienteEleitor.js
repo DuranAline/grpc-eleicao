@@ -32,12 +32,11 @@ rl.question("Digite o número do seu candidato(a):", (input) => {
 })
 
 function votar(numeroCandidato) {
-    clienteEleitor.Votar({numero: numeroCandidato}, (erro, candidatoVotado) => {
+    clienteEleitor.Votar({numero: numeroCandidato}, (erro, menssagem) => {
         if (erro){
             console.log("erro" + erro);
             return;
         }
-        console.log("Votacão realizada com sucesso");
-        console.log("Você votou em: " + candidatoVotado.nome);
+        console.log(menssagem.menssagemRetorno);
     });
 }

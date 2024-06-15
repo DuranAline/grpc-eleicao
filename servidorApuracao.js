@@ -8,14 +8,12 @@ const urnaProto = loadPackageDefinition(urnaDefinicoes);
 
 const apuracaoCliente = new urnaProto.UrnaServico('127.0.0.1:5050', credentials.createInsecure());
 
-let dadosEleicao = [];
+//let dadosEleicao = [];
 let listaApuracao = [];
 
-function apurarVotos() {
+function apurarVotos(dadosEleicao) {
     listaApuracao = [];
-    let candidatoI = dadosEleicao.find((candidato) => candidato.numero == 51);
-    let candidatoII = dadosEleicao.find((candidato) => candidato.numero == 17);
-    let qtdeVotoTotal = candidatoI.qtdeVoto + candidatoII.qtdeVoto;
+    let qtdeVotoTotal = dadosEleicao.reduce((acumulador, candidato) => acumulador + candidato.qtdeVoto, 0);
 
     dadosEleicao.map((candidato) => {
         listaApuracao.push(
@@ -27,14 +25,18 @@ function apurarVotos() {
     })
 }
 
-apuracaoCliente.computarVotos({}, (erro, listaCandidatos)=> {
-    if  (erro){
-        console.log(erro);
-        return;
-    }
-
-    dadosEleicao = listaCandidatos.listaCandidatos;
-})
+function buscarDadosEleicao() {
+    return new Promise((resolve, reject) => {
+        apuracaoCliente.computarVotos({}, (erro, listaCandidatos)=> {
+            if  (erro){
+                console.log(erro);
+                reject(erro);
+                return;
+            }
+            resolve(listaCandidatos.listaCandidatos)
+        })
+    })
+}
 
 const servidorApuracao = new Server();
 const enderecoServidor = "0.0.0.0:5051";
@@ -43,8 +45,8 @@ servidorApuracao.bindAsync(enderecoServidor, ServerCredentials.createInsecure(),
 })
 
 servidorApuracao.addService(urnaProto.UrnaServico.service, {
-    apuracao: (call, callBack) => {
-        apurarVotos()
+    apuracao: async (call, callBack) => {
+        await buscarDadosEleicao().then((dadosEleicao) => apurarVotos(dadosEleicao))
         callBack(null, {listaApuracao: listaApuracao})
     }
 })
